@@ -1,0 +1,13 @@
+name = "ImageSmooth"
+uuid = "a14a6c0f-317a-4379-b4a0-4ba4e1e9b5ed"
+authors = ["Johnny Chen <johnnychen94@hotmail.com>"]
+version = "0.1.0"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
