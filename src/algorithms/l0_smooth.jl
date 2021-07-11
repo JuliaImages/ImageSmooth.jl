@@ -13,10 +13,11 @@ end
 
 L0Smooth(; λ::Float64=2e-2, κ::Float64=2.0) = L0Smooth(λ, κ)
 
-
 function (f::L0Smooth)(out::GenericGrayImage,
                        img::GenericGrayImage)
     S = float.(channelview(img))
+    λ = f.λ
+    κ = f.κ
     βmax = 1e5
     fx = [1 -1]
     fy = [1, -1]
@@ -26,8 +27,8 @@ function (f::L0Smooth)(out::GenericGrayImage,
     otfFx = freqkernel(centered(fx), sizeI2D)
     otfFy = transpose(freqkernel(centered(transpose(fy)), sizeI2D_t))
     Normin1 = fft(S, (1, 2))
-    Denormin2 = abs.(otfFx).^2 + abs.(otfFy ).^2
-
+    Denormin2 = abs.(otfFx).^2 + abs.(otfFy).^2
+    β = 2*λ
     while β < βmax
         Denormin = 1 .+ β * Denormin2
 
@@ -40,12 +41,11 @@ function (f::L0Smooth)(out::GenericGrayImage,
         v[t] .= 0
 
         Normin2 = backdiff(h, dims = 2)
-        Normin2 = Normin2 + backdiff(h, dims = 1)
-        FS = (Normin1 + β*fft(Normin2, (2, 3))) ./ Denormin
+        Normin2 = Normin2 + backdiff(v, dims = 1)
+        FS = (Normin1 + β*fft(Normin2, (1, 2))) ./ Denormin
         S = real(ifft(FS, (1, 2)))
         β = β * κ
     end
-
-    out = colorview(Gray, S)
+    out .= colorview(Gray, S)
     return out
 end

@@ -3,7 +3,6 @@
 
     @testset "API" begin
         img_gray = testimage("cameraman")
-        img = copy(img_gray)
 
         # L0Smooth
         @test L0Smooth() == L0Smooth(λ=2e-2, κ=2.0)
@@ -17,8 +16,17 @@
 
         # smooth
         f = L0Smooth()
-        smoothed_img = smooth(img, f)
+        smoothed_img = smooth(img_gray, f)
         @test eltype(smoothed_img) == Gray{N0f8}
+    end
 
+    @testset "ReferenceTests" begin
+
+        @testset "Gray" begin
+        img_gray = testimage("cameraman")
+        f = L0Smooth()
+        @test_reference "references/L0_Smooth_Gray.png" smooth(img_gray, f) by=psnr_equality(25)
+        end
+        
     end
 end

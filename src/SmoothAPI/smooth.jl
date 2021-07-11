@@ -11,7 +11,6 @@ function smooth(img::AbstractArray{T},
                 f::AbstractImageSmoothAlgorithm,
                 args...; kwargs...) where T <: Colorant
     out = similar(img)
-    smooth!(out, img, f, args...; kargs...)
+    smooth!(out, img, f, args...; kwargs...)
     return out
 end
-

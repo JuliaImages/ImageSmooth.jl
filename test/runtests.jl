@@ -1,5 +1,5 @@
 using ImageSmooth
-using Test, TestImages, ImageTransformations, ImageQualityIndexes
+using Test, ReferenceTests, TestImages, ImageTransformations, ImageQualityIndexes
 using ImageCore
 
 include("testutils.jl")

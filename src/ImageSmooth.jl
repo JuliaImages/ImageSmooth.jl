@@ -1,5 +1,6 @@
 module ImageSmooth
 
+using ImageFiltering, FFTW
 using ImageCore
 using ImageCore: GenericGrayImage
 
