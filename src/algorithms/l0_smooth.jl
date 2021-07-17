@@ -27,7 +27,7 @@ function (f::L0Smooth)(out::GenericGrayImage,
     otfFx = freqkernel(centered(fx), sizeI2D)
     otfFy = transpose(freqkernel(centered(transpose(fy)), sizeI2D_t))
     Normin1 = fft(S, (1, 2))
-    Denormin2 = abs.(otfFx).^2 + abs.(otfFy).^2
+    Denormin2 = @. abs(otfFx)^2 + abs(otfFy)^2
     β = 2*λ
     while β < βmax
         Denormin = 1 .+ β * Denormin2
