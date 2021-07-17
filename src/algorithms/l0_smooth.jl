@@ -15,7 +15,7 @@ L0Smooth(; λ::Float64=2e-2, κ::Float64=2.0) = L0Smooth(λ, κ)
 
 function (f::L0Smooth)(out::GenericGrayImage,
                        img::GenericGrayImage)
-    S = float.(channelview(img))
+    S = of_eltype(floattype(eltype(img)), img)
     λ = f.λ
     κ = f.κ
     βmax = 1e5
