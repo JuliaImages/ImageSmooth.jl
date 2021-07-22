@@ -1,3 +1,14 @@
+"""
+    L0Smooth <: AbstractImageSmoothAlgorithm
+
+    smooth(img, f::L0Smooth)
+    smooth!(out, img, f::L0Smooth)
+
+Smoothen 'img' via L0 gradient minimization to approximate prominent structure
+in a sparsity-control manner.
+
+"""
+
 struct L0Smooth <: AbstractImageSmoothAlgorithm
     """smoothing weight"""
     λ::Float64
@@ -15,37 +26,63 @@ L0Smooth(; λ::Float64=2e-2, κ::Float64=2.0) = L0Smooth(λ, κ)
 
 function (f::L0Smooth)(out::GenericGrayImage,
                        img::GenericGrayImage)
-    S = of_eltype(floattype(eltype(img)), img)
-    λ = f.λ
-    κ = f.κ
-    βmax = 1e5
-    fx = [1 -1]
-    fy = [1, -1]
-    N, M = size(S)
+    𝑆 = float.(channelview(img))
+    𝜆 = f.λ # smoothing weight
+    𝜅 = f.κ # iteration rate
+    𝛽 = 2 * 𝜆 # define 𝛽₀
+    𝛽max = 1e5
+    ∂₁ = [1 -1]
+    ∂₂ = [1, -1]
+    N, M = size(𝑆)
     sizeI2D = (N, M)
     sizeI2D_t = (M, N)
-    otfFx = freqkernel(centered(fx), sizeI2D)
-    otfFy = transpose(freqkernel(centered(transpose(fy)), sizeI2D_t))
-    Normin1 = fft(S, (1, 2))
-    Denormin2 = @. abs(otfFx)^2 + abs(otfFy)^2
-    β = 2*λ
-    while β < βmax
-        Denormin = 1 .+ β * Denormin2
+    ℱ∂₁ = freqkernel(centered(∂₁), sizeI2D)
+    ℱ∂₂ = transpose(freqkernel(centered(transpose(∂₂)), sizeI2D_t))
+    ℱ𝐼 = fft(𝑆)
+    Denormin = similar(ℱ𝐼)
+    @. Denormin = abs(ℱ∂₁)^2 + abs(ℱ∂₂)^2
 
-        h = forwarddiff(S, dims = 2)
-        v = forwarddiff(S, dims = 1)
+    # Denormin = similar(Denormin2)
+    𝛥₁𝑆 = similar(𝑆)
+    𝛥₂𝑆 = similar(𝑆)
+    𝛻₁ℎ = similar(𝑆)
+    𝛻₂𝑣 = similar(𝑆)
 
-        t = (h.^2 + v.^2) .< λ / β
+    Normin = similar(ℱ𝐼) 
+    t = trues(N, M)
+    ℱ𝑆 = similar(ℱ𝐼)
 
-        h[t] .= 0
-        v[t] .= 0
+    while 𝛽 < 𝛽max
+        # Computing (ℎ, 𝑣) via solving equation (9)
+        # Actually, we get the solution in (12) through following process
+        # Use 𝛥₁𝑆, 𝛥₂𝑆 to demonstrate ℎ, 𝑣 for convenience
+        forwarddiff!(𝛥₁𝑆, 𝑆, dims = 2)
+        forwarddiff!(𝛥₂𝑆, 𝑆, dims = 1)
 
-        Normin2 = backdiff(h, dims = 2)
-        Normin2 = Normin2 + backdiff(v, dims = 1)
-        FS = (Normin1 + β*fft(Normin2, (1, 2))) ./ Denormin
-        S = real(ifft(FS, (1, 2)))
-        β = β * κ
+        # For each pixel 𝑝 in 𝑆
+        # (ℎₚ, 𝑣ₚ) = (0, 0), while (𝛥₁𝑆ₚ^2 + 𝛥₂𝑆ₚ^2) < λ / 𝛽
+        # (ℎₚ, 𝑣ₚ) = (𝛥₁𝑆ₚ, 𝛥₂𝑆ₚ), otherwise
+        @. t = (𝛥₁𝑆^2 + 𝛥₂𝑆^2) < 𝜆 / 𝛽
+
+        𝛥₁𝑆[t] .=  0
+        𝛥₂𝑆[t] .=  0
+
+        # For equation (8), ℎ = 𝛥₁𝑆, 𝑣 = 𝛥₂𝑆
+        # According to Convolution Theorem, ℱ(𝑓₁ * 𝑓₂) = ℱ(𝑓₁) × ℱ(𝑓₂)
+        # ℱ is the FFT operator, * is a convolution operator, × is a matrix times operator
+        # We can compute ℱ(∂₁)* × ℱ(ℎ) and ℱ(∂₂)* × ℱ(𝑣) by computing ℱ(𝛻₁ℎ) and ℱ(𝛻₂𝑣)
+        # ∂₁ and ∂₂ are the difference operators along horizontal axis and vertical axis, respectivly
+        # 𝛻₁() and 𝛻₂() indicate the backward difference along horizontal axis and vertical axis
+        backdiff!(𝛻₁ℎ, 𝛥₁𝑆, dims = 2)
+        backdiff!(𝛻₂𝑣, 𝛥₂𝑆, dims = 1)
+
+        # Computing S via equation (8)
+        @. Normin = complex(𝛻₁ℎ + 𝛻₂𝑣)
+        ℱ𝑆 .= (ℱ𝐼 .+ 𝛽 .* fft!(Normin)) ./ (1 .+ 𝛽 .* Denormin)
+        𝑆 .= real.(ifft!(ℱ𝑆))
+
+        𝛽 = 𝛽 * 𝜅
     end
-    out .= colorview(Gray, S)
+    out .= colorview(Gray, 𝑆)
     return out
 end
