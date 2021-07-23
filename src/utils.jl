@@ -1,5 +1,5 @@
 function forwarddiff(a::AbstractArray{T,N}; dims::Int) where {T,N}
-    Base.require_one_based_indexing(a)
+    require_one_based_indexing(a)
     1 <= dims <= N || throw(ArgumentError("dimension $dims out of range (1:$N)"))
 
     d = similar(a)
@@ -17,7 +17,7 @@ function forwarddiff(a::AbstractArray{T,N}; dims::Int) where {T,N}
 end
 
 function backdiff(a::AbstractArray{T,N}; dims::Int) where {T,N}
-    Base.require_one_based_indexing(a)
+    require_one_based_indexing(a)
     1 <= dims <= N || throw(ArgumentError("dimension $dims out of range (1:$N)"))
 
     d = similar(a)
@@ -35,8 +35,7 @@ function backdiff(a::AbstractArray{T,N}; dims::Int) where {T,N}
 end
 
 function forwarddiff!(d::AbstractArray{T,N}, a::AbstractArray{T,N}; dims::Int) where {T,N}
-    Base.require_one_based_indexing(d)
-    Base.require_one_based_indexing(a)
+    require_one_based_indexing(a)
     1 <= dims <= N || throw(ArgumentError("dimension $dims out of range (1:$N)"))
 
     r = axes(a)
@@ -51,8 +50,7 @@ function forwarddiff!(d::AbstractArray{T,N}, a::AbstractArray{T,N}; dims::Int) w
 end
 
 function backdiff!(d::AbstractArray{T,N}, a::AbstractArray{T,N}; dims::Int) where {T,N}
-    Base.require_one_based_indexing(d)
-    Base.require_one_based_indexing(a)
+    require_one_based_indexing(a)
     1 <= dims <= N || throw(ArgumentError("dimension $dims out of range (1:$N)"))
 
     r = axes(a)

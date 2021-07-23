@@ -10,6 +10,7 @@ import .SmoothAPI: AbstractImageSmoothAlgorithm,
                    smooth, smooth!
 
 include("utils.jl")
+include("compat.jl")
 
 # Smooth algorithms
 
