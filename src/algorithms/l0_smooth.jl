@@ -26,7 +26,7 @@ L0Smooth(; λ::Float64=2e-2, κ::Float64=2.0) = L0Smooth(λ, κ)
 
 function (f::L0Smooth)(out::GenericGrayImage,
                        img::GenericGrayImage)
-    𝑆 = float.(channelview(img))
+    𝑆 = float64.(channelview(img))
     𝜆 = f.λ # smoothing weight
     𝜅 = f.κ # iteration rate
     𝛽 = 2 * 𝜆 # define 𝛽₀
@@ -42,7 +42,6 @@ function (f::L0Smooth)(out::GenericGrayImage,
     Denormin = similar(ℱ𝐼)
     @. Denormin = abs(ℱ∂₁)^2 + abs(ℱ∂₂)^2
 
-    # Denormin = similar(Denormin2)
     𝛥₁𝑆 = similar(𝑆)
     𝛥₂𝑆 = similar(𝑆)
     𝛻₁ℎ = similar(𝑆)
@@ -64,8 +63,11 @@ function (f::L0Smooth)(out::GenericGrayImage,
         # (ℎₚ, 𝑣ₚ) = (𝛥₁𝑆ₚ, 𝛥₂𝑆ₚ), otherwise
         @. t = (𝛥₁𝑆^2 + 𝛥₂𝑆^2) < 𝜆 / 𝛽
 
-        𝛥₁𝑆[t] .=  0
-        𝛥₂𝑆[t] .=  0
+        𝛥₁𝑆[t] .= 0
+        𝛥₂𝑆[t] .= 0
+
+        # 𝛥₁𝑆[(𝛥₁𝑆.^2 .+ 𝛥₂𝑆.^2) .< 𝜆 / 𝛽] .= 0
+        # 𝛥₂𝑆[(𝛥₁𝑆.^2 .+ 𝛥₂𝑆.^2) .< 𝜆 / 𝛽] .= 0
 
         # For equation (8), ℎ = 𝛥₁𝑆, 𝑣 = 𝛥₂𝑆
         # According to Convolution Theorem, ℱ(𝑓₁ * 𝑓₂) = ℱ(𝑓₁) × ℱ(𝑓₂)
@@ -78,8 +80,10 @@ function (f::L0Smooth)(out::GenericGrayImage,
 
         # Computing S via equation (8)
         @. Normin = complex(𝛻₁ℎ + 𝛻₂𝑣)
-        ℱ𝑆 .= (ℱ𝐼 .+ 𝛽 .* fft!(Normin)) ./ (1 .+ 𝛽 .* Denormin)
-        𝑆 .= real.(ifft!(ℱ𝑆))
+        fft!(Normin)
+        @. ℱ𝑆 = (ℱ𝐼 + 𝛽 * Normin) / (1 + 𝛽 * Denormin)
+        ifft!(ℱ𝑆)
+        @. 𝑆 = real(ℱ𝑆)
 
         𝛽 = 𝛽 * 𝜅
     end

@@ -1,6 +1,6 @@
 module ImageSmooth
 
-using ImageFiltering, FFTW
+using ImageFiltering, FFTW, MappedArrays
 using ImageCore
 using ImageCore: GenericGrayImage
 
@@ -11,7 +11,7 @@ import .SmoothAPI: AbstractImageSmoothAlgorithm,
 
 include("utils.jl")
 
-#Concrete smooth algorithms
+# Smooth algorithms
 
 include("algorithms/l0_smooth.jl") # L0Smooth
 
