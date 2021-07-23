@@ -34,7 +34,7 @@ function backdiff(a::AbstractArray{T,N}; dims::Int) where {T,N}
     return d
 end
 
-function forwarddiff!(d::AbstractArray{T,N}, a::AbstractArray{T,N}, dims::Int) where {T,N}
+function forwarddiff!(d::AbstractArray{T,N}, a::AbstractArray{T,N}; dims::Int) where {T,N}
     Base.require_one_based_indexing(d)
     Base.require_one_based_indexing(a)
     1 <= dims <= N || throw(ArgumentError("dimension $dims out of range (1:$N)"))
@@ -50,7 +50,7 @@ function forwarddiff!(d::AbstractArray{T,N}, a::AbstractArray{T,N}, dims::Int) w
     d[d0...] = view(a, d1...) .- view(a, d0...)
 end
 
-function backdiff!(d::AbstractArray{T,N}, a::AbstractArray{T,N}, dims::Int) where {T,N}
+function backdiff!(d::AbstractArray{T,N}, a::AbstractArray{T,N}; dims::Int) where {T,N}
     Base.require_one_based_indexing(d)
     Base.require_one_based_indexing(a)
     1 <= dims <= N || throw(ArgumentError("dimension $dims out of range (1:$N)"))
