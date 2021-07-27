@@ -1,7 +1,12 @@
-using TestImages, ImageSmooth, Images
-img = testimage("cameraman");
+using TestImages, ImageSmooth, Images, BenchmarkTools
+# img1 = load("pflower.jpg")
+img1 = testimage("lena_color_512")
+img2 = testimage("cameraman")
 f = L0Smooth()
 
-smoothed_img = smooth(img, f)
+# @btime smooth(img1, f)
 
-colorview(Gray, smoothed_img)
+smoothed_img = smooth(img1, f)
+
+# colorview(Gray, smoothed_img)
+colorview(RGB, smoothed_img)

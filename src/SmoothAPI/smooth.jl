@@ -37,17 +37,36 @@ f = L0Smooth()
 
 abstract type AbstractImageSmoothAlgorithm <: AbstractImageFilter end
 
-smooth!(out::GenericGrayImage,
-        img::GenericGrayImage,
+# smooth!(out::GenericGrayImage,
+#         img::GenericGrayImage,
+#         f::AbstractImageSmoothAlgorithm,
+#         args...; kwargs...) =
+#     f(out, img, args...; kwargs...)
+
+# smooth!(out::GenericGrayImage,
+#         img::GenericGrayImage,
+#         f::AbstractImageSmoothAlgorithm,
+#         args...; kwargs...) =
+#     f(out, img, args...; kwargs...)
+
+smooth!(out::AbstractArray{<: Colorant},
+        img::AbstractArray{<: Colorant},
         f::AbstractImageSmoothAlgorithm,
         args...; kwargs...) =
     f(out, img, args...; kwargs...)
 
-
-function smooth(img::AbstractArray{T},
+function smooth(img::GenericGrayImage,
                 f::AbstractImageSmoothAlgorithm,
-                args...; kwargs...) where T <: Colorant
+                args...; kwargs...)
     out = similar(img)
+    smooth!(out, img, f, args...; kwargs...)
+    return out
+end
+
+function smooth(img::GenericImage,
+                f::AbstractImageSmoothAlgorithm,
+                args...; kwargs...)
+    out = Array{RGB{Float64}}(undef, size(img)...);
     smooth!(out, img, f, args...; kwargs...)
     return out
 end

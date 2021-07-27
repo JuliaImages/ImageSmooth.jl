@@ -28,5 +28,10 @@
         @test_reference "references/L0_Smooth_Gray.png" smooth(img_gray, f) by=psnr_equality(25)
         end
         
+        @testset "RGB" begin
+        img_rgb = testimage("lena_color_512")
+        f = L0Smooth()
+        @test_reference "references/L0_Smooth_Color3.png" smooth(img_rgb, f) by=psnr_equality(25)
+        end
     end
 end
