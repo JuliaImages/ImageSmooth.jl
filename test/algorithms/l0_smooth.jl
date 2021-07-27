@@ -3,6 +3,7 @@
 
     @testset "API" begin
         img_gray = testimage("cameraman")
+        img_rgb = testimage("lena_color_512")
 
         # L0Smooth
         @test L0Smooth() == L0Smooth(λ=2e-2, κ=2.0)
@@ -16,22 +17,28 @@
 
         # smooth
         f = L0Smooth()
-        smoothed_img = smooth(img_gray, f)
-        @test eltype(smoothed_img) == Gray{N0f8}
+        smoothed_img_gray = smooth(img_gray, f)
+        smoothed_img_rgb = smooth(img_rgb, f)
+        @test eltype(smoothed_img_gray) == Gray{Float64}
+        @test eltype(smoothed_img_rgb) == RGB{Float64}
     end
 
     @testset "ReferenceTests" begin
 
         @testset "Gray" begin
         img_gray = testimage("cameraman")
+        ref = load("algorithms/references/L0_Smooth_Gray.png")
         f = L0Smooth()
-        @test_reference "references/L0_Smooth_Gray.png" smooth(img_gray, f) by=psnr_equality(25)
+        out = smooth(img_gray, f)
+        @test assess_psnr(out, eltype(out).(ref)) >= 58
         end
         
         @testset "RGB" begin
         img_rgb = testimage("lena_color_512")
+        ref = load("algorithms/references/L0_Smooth_Color3.png")
         f = L0Smooth()
-        @test_reference "references/L0_Smooth_Color3.png" smooth(img_rgb, f) by=psnr_equality(25)
+        out = smooth(img_rgb, f)
+        @test assess_psnr(out, eltype(out).(ref)) >= 58
         end
     end
 end
