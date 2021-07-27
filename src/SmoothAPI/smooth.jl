@@ -37,20 +37,8 @@ f = L0Smooth()
 
 abstract type AbstractImageSmoothAlgorithm <: AbstractImageFilter end
 
-# smooth!(out::GenericGrayImage,
-#         img::GenericGrayImage,
-#         f::AbstractImageSmoothAlgorithm,
-#         args...; kwargs...) =
-#     f(out, img, args...; kwargs...)
-
-# smooth!(out::GenericGrayImage,
-#         img::GenericGrayImage,
-#         f::AbstractImageSmoothAlgorithm,
-#         args...; kwargs...) =
-#     f(out, img, args...; kwargs...)
-
-smooth!(out::AbstractArray{<: Colorant},
-        img::AbstractArray{<: Colorant},
+smooth!(out::AbstractArray{<: Number},
+        img::AbstractArray{<: Number},
         f::AbstractImageSmoothAlgorithm,
         args...; kwargs...) =
     f(out, img, args...; kwargs...)
@@ -58,15 +46,17 @@ smooth!(out::AbstractArray{<: Colorant},
 function smooth(img::GenericGrayImage,
                 f::AbstractImageSmoothAlgorithm,
                 args...; kwargs...)
-    out = similar(img)
-    smooth!(out, img, f, args...; kwargs...)
-    return out
+    input = reshape(channelview(img), 1, size(img)...)
+    out = similar(float64.(channelview(input)))
+    smooth!(out, input, f, args...; kwargs...)
+    return colorview(Gray, out[1, :, :])
 end
 
-function smooth(img::GenericImage,
+function smooth(img::GenericImage{<:Color3},
                 f::AbstractImageSmoothAlgorithm,
                 args...; kwargs...)
-    out = Array{RGB{Float64}}(undef, size(img)...);
-    smooth!(out, img, f, args...; kwargs...)
-    return out
+    input = channelview(img)
+    out = similar(float64.(input))
+    smooth!(out, input, f, args...; kwargs...)
+    return colorview(RGB, out)
 end
