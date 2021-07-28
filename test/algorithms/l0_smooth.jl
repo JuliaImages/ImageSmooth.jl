@@ -6,14 +6,21 @@
         img_rgb = testimage("lena_color_512")
 
         # L0Smooth
-        @test L0Smooth() == L0Smooth(λ=2e-2, κ=2.0)
-        @test L0Smooth(κ=1.5) == L0Smooth(λ=2e-2, κ=1.5)
-        @test L0Smooth(λ=1e-2) == L0Smooth(λ=1e-2, κ=2.0)
+        @test L0Smooth() == L0Smooth(λ=2e-2, κ=2.0, βmax=1e5)
+        @test L0Smooth(λ=1e-2) == L0Smooth(λ=1e-2, κ=2.0, βmax=1e5)
+        @test L0Smooth(κ=1.5) == L0Smooth(λ=2e-2, κ=1.5, βmax=1e5)
+        @test L0Smooth(βmax=1e6) == L0Smooth(λ=2e-2, κ=2.0, βmax=1e6)
+        @test L0Smooth(λ=1e-2, κ=1.5) == L0Smooth(λ=1e-2, κ=1.5, βmax=1e5)
+        @test L0Smooth(βmax=1e6, κ=1.5) == L0Smooth(λ=2e-2, κ=1.5, βmax=1e6)
+        @test L0Smooth(βmax=1e6, λ=1e-2) == L0Smooth(λ=1e-2, κ=2.0, βmax=1e6)
+        @test L0Smooth(βmax=1e6, λ=1e-2, κ=1.5) == L0Smooth(λ=1e-2, κ=1.5, βmax=1e6)
 
         # λ should be positive
-        @test_throws ArgumentError L0Smooth(λ=-2e-2, κ=2.0)
+        @test_throws ArgumentError L0Smooth(λ=-2e-2)
         # κ > 1.0
-        @test_throws ArgumentError L0Smooth(λ=2e-2, κ=0.8)
+        @test_throws ArgumentError L0Smooth(κ=0.8)
+        # βmax > 1e4
+        @test_throws ArgumentError L0Smooth(βmax=1e3)
 
         # smooth
         f = L0Smooth()

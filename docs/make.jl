@@ -1,4 +1,5 @@
-using ImageSmooth
+push!(LOAD_PATH,"../src/")
+using ImageSmooth, TestImages, MosaicViews
 using Documenter
 
 DocMeta.setdocmeta!(ImageSmooth, :DocTestSetup, :(using ImageSmooth); recursive=true)
@@ -15,6 +16,9 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
+        "Usage" => "usage.md",
+        "Algorithms" => "algorithms.md",
+        "Package Reference" => "reference.md",
     ],
 )
 

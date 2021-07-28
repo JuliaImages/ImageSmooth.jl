@@ -63,6 +63,3 @@ function backdiff!(d::AbstractArray{T,N}, a::AbstractArray{T,N}; dims::Int) wher
     d[r1...] = view(a, r0...) .- view(a, r1...)
     d[d1...] = view(a, d0...) .- view(a, d1...)
 end
-
-expanded_channelview(img::AbstractArray{T}) where T<:Colorant = channelview(img)
-expanded_channelview(img::AbstractArray{T}) where T<:Gray = reshape(channelview(img), 1, size(img)...)
