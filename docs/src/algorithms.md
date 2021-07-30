@@ -103,12 +103,16 @@ using Images, TestImages, MosaicViews
 
 ```@example mosaicviews
 using ImageSmooth
+
 # L0 Smooth for Gray images
 img_gray = testimage("cameraman")
+
 # Using L0 Smooth algorithm
 fₛ = L0Smooth() # using default arguements
+
 # Apply the algorithm to the image
 imgₛ = smooth(img_gray, fₛ)
+
 mosaicview(img_gray, imgₛ; nrow=1)
 ```
 
@@ -116,7 +120,10 @@ mosaicview(img_gray, imgₛ; nrow=1)
 using ImageSmooth # hide
 # L0 Smooth for RGB images
 img_rgb = testimage("lena_color_512")
+
 fₛ = L0Smooth(λ=4e-2, κ=2.0, βmax=1e5) # manually setting arguements
+
 imgₛ = smooth(img_rgb, fₛ)
+
 mosaicview(img_rgb, imgₛ; nrow=1)
 ```

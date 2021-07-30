@@ -12,6 +12,13 @@ smooth
 smooth!
 ```
 
+```@docs
+forwarddiff
+forwarddiff!
+backdiff
+backdiff!
+```
+
 ## Algorithm
 
 ```@docs

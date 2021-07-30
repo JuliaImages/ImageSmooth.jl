@@ -22,6 +22,18 @@
         # βmax > 1e4
         @test_throws ArgumentError L0Smooth(βmax=1e3)
 
+        # forwarddiff and forwarddiff!
+        mat_in = rand(3, 3, 3)
+        mat_out = similar(mat_in)
+        forwarddiff!(mat_out, mat_in, dims = 2)
+        @test mat_out == forwarddiff(mat_in, dims = 2)
+
+        # backdiff and backdiff!
+        mat_in = rand(3, 3, 3)
+        mat_out = similar(mat_in)
+        backdiff!(mat_out, mat_in, dims = 3)
+        @test mat_out == backdiff(mat_in, dims = 3)
+
         # smooth
         f = L0Smooth()
         smoothed_img_gray = smooth(img_gray, f)
@@ -31,6 +43,8 @@
     end
 
     @testset "ReferenceTests" begin
+        # these two reference images are generated from original matlab codes
+        # <http://www.cse.cuhk.edu.hk/leojia/projects/L0smoothing/index.html>
 
         @testset "Gray" begin
         img_gray = testimage("cameraman")

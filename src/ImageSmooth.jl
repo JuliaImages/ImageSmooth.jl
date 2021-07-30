@@ -20,6 +20,9 @@ export
     # generic API
     smooth, smooth!,
 
+    # forward difference and backward difference
+    forwarddiff, forwarddiff!, backdiff, backdiff!,
+
     # Algorithms
     L0Smooth
 

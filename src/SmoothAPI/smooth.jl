@@ -8,24 +8,25 @@ Any image smoothing algorithm shall subtype it to support
 
 # Examples
 
-All algorithm in ImageSmooth are called in the following pattern:
+All algorithm in `ImageSmooth` are called in the following pattern, 
+take `L0Smooth <: AbstractImageSmoothAlgorithm` as an example:
 
 ```julia
-# first generate an algorithm instance
+# First generate an algorithm instance
 fₛ = L0Smooth()
 
-# then pass the algorithm to `smooth`
+# Then pass the algorithm to `smooth`
 imgₛ = smooth(img, fₛ)
 
-# or use in-place version `smooth!`
+# Or use in-place version `smooth!`
 
-## for Gray images
+## Ror Gray images
 input = reshape(channelview(img), 1, size(img)...)
 imgₛ = similar(float64.(input))
 
 smooth!(imgₛ, input, fₛ)
 
-## for RGB images
+## For RGB images
 input = channelview(img)
 imgₛ = similar(float64.(input))
 
@@ -36,10 +37,10 @@ Some algorithms also receive parameters to control the smoothing process and
 to get an expected smooth degree.
 
 ```julia
-# you could explicit specify it
+# You could explicit specify it
 f = L0Smooth(λ=0.04, κ=1.5, βmax=1e6)
 
-# or infer the default value
+# Or infer the default value
 f = L0Smooth()
 ```
 
@@ -75,7 +76,7 @@ end
 ### Docstrings
 
 """
-    smooth!(out::AbstractArray{<: Number}, img::AbstractArray{<: Number}, f::AbstractImageSmoothAlgorithm, args...; kwargs...)
+    smooth!(out::AbstractArray{<: Number}, img::AbstractArray{<: Number}, fₛ::AbstractImageSmoothAlgorithm, args...; kwargs...)
 
 Smooth `img::AbstractArray{<: Number}` using algorithm `fₛ`
 
@@ -109,13 +110,13 @@ See also: [`smooth`](@ref)
 smooth!
 
 """
-    smooth(img, f::AbstractImageSmoothAlgorithm, args...; kwargs...)
+    smooth(img, fₛ::AbstractImageSmoothAlgorithm, args...; kwargs...)
 
 Smooth `img` using algorithm `fₛ`
 
 # Output
 
-The return image `imgₛ` is an `Array{Gray{Float64}}} for a Gray input, and `Array{RGB{Float64}}}` for a RGB input.
+The return image `imgₛ` is an `Array{Gray{Float64}} for `Gray` image, and `Array{RGB{Float64}}` for `RGB` image.
 
 # Examples
 
@@ -127,7 +128,7 @@ fₛ = L0Smooth()
 imgₛ = smooth(img, fₛ)
 ```
 
-This reads as "`smooth` image `img` using binarization algorithm `fₛ`".`
+This reads as "`smooth` image `img` using smoothing algorithm `fₛ`".
 
 See also [`smooth!`](@ref) for in-place smoothing.
 """

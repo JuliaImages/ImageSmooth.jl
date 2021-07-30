@@ -15,7 +15,7 @@ You can install `ImageSmooth.jl` via [package manager](https://docs.julialang.or
 (@v1.6) pkg> add ImageSmooth
 ```
 
-## Using an image smoothing algorithm
+## Using an image-smoothing algorithm
 
 Each smoothing algorithm in `ImageSmooth.jl` is an [`AbstractImageSmoothAlgorithm`](@ref ImageSmooth.SmoothAPI.AbstractImageSmoothAlgorithm).
 
@@ -95,12 +95,10 @@ img = testimage("cameraman")
 
 fₛ = L0Smooth()
 
-
 input = reshape(channelview(img), 1, size(img)...)
 imgₛ = similar(float64.(input))
 
 smooth!(imgₛ, input, fₛ)
-
 
 # View the original image and the smoothed image
 mosaicview(img, imgₛ[1, :, :]; nrow=1)

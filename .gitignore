@@ -4,3 +4,5 @@
 /Manifest.toml
 /docs/build/
 /docs/Manifest.toml
+/src/algorithms/test.jl
+/src/algorithms/try.jl

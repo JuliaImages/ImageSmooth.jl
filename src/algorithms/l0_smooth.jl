@@ -10,7 +10,10 @@ in a sparsity-control manner.
 
 # Output
 
-Return the smoothed image as an `Array{Float64}` of `size(channelview(img))`.
+Return the smoothed image as an `Array{Float64}` of `size(input)`.
+
+For Gray img, `input = reshape(channelview(img), 1, size(img)...)`.
+For RGB image, `input = channelview(img)`.
 
 # Details
 
@@ -49,21 +52,29 @@ The argument `𝜅` is the iteraiton rate, which must be larger than 1.0.
 
 This algorithm using an alternating optimization strategy to get the solution.
 In each iteration, the argument `𝛽` controls the similarity between gradient pair 
-`(𝛥₁𝑆ₚ, 𝛥₂𝑆ₚ)` (denoted by `($ \partial_x S_p $, \partial_y S_p)`) and auxiliary pair `(ℎₚ, 𝑣ₚ)`.
+(𝛥₁𝑆ₚ, 𝛥₂𝑆ₚ) (denoted by `` (\partial_x S_p, \partial_y S_p) `` in [1]) and auxiliary pair (ℎₚ, 𝑣ₚ).
 The argument `𝜅` is used to update `𝛽` as `𝛽 ⟵ 𝜅𝛽`.
 
 Default: 2.0
 
 # Examples
 
+You can use the default arguments for `L0Smooth`, and then use `smooth` to apply 
+the `AbstractImageSmoothAlgorithm`.
+
 ```julia
 using TestImages
 using ImageSmooth
 
 img = testimage("cameraman")
+
 fₛ = L0Smooth() # using default arguements
 imgₛ = smooth(img, fₛ)
+```
 
+Manually setting the arguements is also available:
+
+```julia
 fₛ = L0Smooth(λ=0.0015, κ=1.05, βmax=2e5) # manually set the arguments
 imgₛ = smooth(img, fₛ)
 ```
@@ -127,8 +138,8 @@ function (f::L0Smooth)(out::AbstractArray{<: Number},
     ℱ𝑆 = similar(ℱ𝐼)
 
     while 𝛽 < 𝛽max
-        # Computing (ℎ, 𝑣) via solving equation (9)
-        # Actually, we get the solution in (12) through following process
+        # Computing (ℎ, 𝑣) via solving equation (9) in [1]
+        # We get the solution (12) in [1] through following process
         # Use (𝛥₁𝑆, 𝛥₂𝑆) to demonstrate (ℎ, 𝑣) for convenience
         forwarddiff!(𝛥₁𝑆, 𝑆, dims = 3)
         forwarddiff!(𝛥₂𝑆, 𝑆, dims = 2)
