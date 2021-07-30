@@ -1,5 +1,12 @@
 # [Using ImageSmooth](@id usage)
 
+```@meta
+CurrentModule = ImageSmooth
+DocTestSetup = quote
+    using ImageSmooth
+end
+```
+
 ## Installation
 
 You can install `ImageSmooth.jl` via [package manager](https://docs.julialang.org/en/v1/stdlib/Pkg/).
@@ -10,17 +17,13 @@ You can install `ImageSmooth.jl` via [package manager](https://docs.julialang.or
 
 ## Using an image smoothing algorithm
 
-Each smoothing algorithm in `ImageSmooth.jl` is an [AbstractImageSmoothAlgorithm](@ref ImageSmooth.SmoothAPI.AbstractImageSmoothAlgorithm).
+Each smoothing algorithm in `ImageSmooth.jl` is an [`AbstractImageSmoothAlgorithm`](@ref ImageSmooth.SmoothAPI.AbstractImageSmoothAlgorithm).
 
-Currently, there is one image smoothing algorithm can be used:
+Currently, there is one image-smoothing algorithm can be used:
 
 * [`L0 Smooth`](@ref l0_smooth)
 
-```@docs
-L0Smooth
-```
-
-You can define an iamge smoothing algorithm as follow.
+You can define an image-smoothing algorithm `fₛ` as follow.
 
 ```@repl
 using ImageSmooth
@@ -29,21 +32,40 @@ fₛ = L0Smooth()
 
 ## Applying the algorithm to the image
 
-`smooth` and `smooth!`
+All of the algorithms are applied to the image via [`smooth`](@ref smooth) or the in-place operation [`smooth!`](@ref smooth!).
 
-All of the algorithm is applied to the image via `smooth` or the in-place operation `smooth!`.
+* [`smooth`](@ref smooth)
 
-```@docs
-smooth!
+```@setup smooth
+using TestImages, ImageSmooth
+img = testimage("cameraman")
+fₛ = L0Smooth()
 ```
 
-```@docs
-smooth
+```@repl smooth
+imgₛ = smooth(img, fₛ);
+```
+
+* [`smooth!`](@ref smooth!)
+
+```@setup smooth!
+using Images, TestImages, ImageSmooth
+img = testimage("cameraman")
+fₛ = L0Smooth()
+```
+
+```@repl smooth!
+input = reshape(channelview(img), 1, size(img)...);
+imgₛ = similar(float64.(input));
+
+smooth!(imgₛ, input, fₛ);
 ```
 
 ## Demonstration
 
-To use the smoothing operator, you have to first define a `smooth_algorithm::AbstractImageSmoothAlgorithm`, like `L0Smooth`. Then you can apply `smooth_algorithm` by using `smooth` or `smooth!`.
+To use the smoothing operator, you have to first define a `fₛ::AbstractImageSmoothAlgorithm`, like `L0Smooth`. Then you can apply `fₛ` by using `smooth` or `smooth!`.
+
+* You can use [`smooth`](@ref smooth) to process your image:
 
 ```@setup mosaicviews
 using Images, TestImages, MosaicViews
@@ -64,7 +86,7 @@ imgₛ = smooth(img, fₛ)
 mosaicview(img, imgₛ; nrow=1)
 ```
 
-You can also use the in-place operator `smooth!`:
+* You can also use the in-place operator [`smooth!`](@ref smooth):
 
 ```@example mosaicviews
 using ImageSmooth

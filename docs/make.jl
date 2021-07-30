@@ -16,9 +16,9 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
-        "Usage" => "usage.md",
+        "Using ImageSmooth" => "usage.md",
         "Algorithms" => "algorithms.md",
-        "Package Reference" => "reference.md",
+        "Package References" => "reference.md",
     ],
 )
 

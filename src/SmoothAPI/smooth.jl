@@ -43,8 +43,9 @@ f = L0Smooth(λ=0.04, κ=1.5, βmax=1e6)
 f = L0Smooth()
 ```
 
+For more examples, please check [`smooth`](@ref) and [`smooth!`](@ref) and concret
+algorithms.
 """
-
 abstract type AbstractImageSmoothAlgorithm <: AbstractImageFilter end
 
 smooth!(out::AbstractArray{<: Number},
@@ -74,9 +75,9 @@ end
 ### Docstrings
 
 """
-    smooth!(out, img, f::AbstractImageSmoothAlgorithm, args...; kwargs...)
+    smooth!(out::AbstractArray{<: Number}, img::AbstractArray{<: Number}, f::AbstractImageSmoothAlgorithm, args...; kwargs...)
 
-Smooth `img` using algorithm `fₛ`
+Smooth `img::AbstractArray{<: Number}` using algorithm `fₛ`
 
 # Output
 
@@ -108,7 +109,7 @@ See also: [`smooth`](@ref)
 smooth!
 
 """
-    smooth(img, f, args...; kwargs...)
+    smooth(img, f::AbstractImageSmoothAlgorithm, args...; kwargs...)
 
 Smooth `img` using algorithm `fₛ`
 

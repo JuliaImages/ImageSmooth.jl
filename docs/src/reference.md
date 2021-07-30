@@ -12,14 +12,10 @@ smooth
 smooth!
 ```
 
-## Algorithms
+## Algorithm
 
 ```@docs
+ImageSmooth.SmoothAPI.AbstractImageAlgorithm
+ImageSmooth.SmoothAPI.AbstractImageFilter
 ImageSmooth.SmoothAPI.AbstractImageSmoothAlgorithm
-```
-
-### L0 Smooth
-
-```@docs
-L0Smooth
 ```

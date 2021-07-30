@@ -1,19 +1,21 @@
 # [Algorithms](@id algorithms)
 
-The image smoothing algorithm in Julia.
+The image-smoothing algorithms in Julia.
 
 ## [L0 Smooth](@id l0_smooth)
 
+**L0 Smooth** ([paper](http://www.cse.cuhk.edu.hk/leojia/projects/L0smoothing/index.html)) is an image-smoothing algorthim through minimizing the L0 norm of image's gradient.
+
 ```@docs
-L0Smooth()
+L0Smooth
 ```
 
-```@example
-using ImageSmooth # hide
+### Using in the REPL
+
+```@repl
+using ImageSmooth
 L0Smooth()
 ```
-
-L0 Smooth ([paper](http://www.cse.cuhk.edu.hk/leojia/projects/L0smoothing/index.html)) is an image smoothing algorthim through minimizing the L0 norm of image's gradient.
 
 ### Details of L0 Smoothing
 
@@ -53,7 +55,7 @@ The subproblem for `` S `` is to minimize:
 
 and the solution is:
 
-```math 
+```math
 S = \mathscr{F}^{-1}\left(\frac{\mathscr{F}(I) + \beta \left(\mathscr{F}(\partial_{x})^*\mathscr{F}(h) + \mathscr{F}(\partial_y)^*\mathscr{F}(v)\right)}{\mathscr{F}(1) + \beta \left(\mathscr{F}(\partial_{x})^*\mathscr{F}(\partial_{x}) + \mathscr{F}(\partial_y)^*\mathscr{F}(\partial_y)\right)}\right).
 ```
 
