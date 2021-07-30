@@ -1,6 +1,6 @@
 module ImageSmooth
 
-using ImageFiltering, FFTW, MappedArrays
+using ImageFiltering, FFTW
 using ImageCore
 using ImageCore: GenericGrayImage, GenericImage
 
