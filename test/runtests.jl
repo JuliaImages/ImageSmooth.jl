@@ -1,6 +1,11 @@
 using ImageSmooth
-using Test
+using Test, ReferenceTests, TestImages
+using FileIO
+using ImageTransformations, ImageQualityIndexes
+using ImageCore
+
+include("testutils.jl")
 
 @testset "ImageSmooth.jl" begin
-    # Write your tests here.
+    include("algorithms/l0_smooth.jl")
 end
