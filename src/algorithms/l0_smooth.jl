@@ -136,7 +136,6 @@ function (f::L0Smooth)(out::AbstractArray{<: Number},
 
     Normin = similar(ℱ𝐼) 
     t¹ = trues(1, N, M)
-    t = trues(N, M)
     t³ = trues(D, N, M)
     ℱ𝑆 = similar(ℱ𝐼)
 
@@ -154,10 +153,7 @@ function (f::L0Smooth)(out::AbstractArray{<: Number},
             @. s³ = 𝛥₁𝑆^2 + 𝛥₂𝑆^2
             s¹ .= sum(s³, dims=1)
             @. t¹ = s¹ < 𝜆 / 𝛽
-            # t¹ .= sum((𝛥₁𝑆.^2 .+ 𝛥₂𝑆.^2), dims=1) .< 𝜆 / 𝛽
             t³ .= repeat(t¹, inner=(1, 1, 1), outer=(D, 1, 1))
-            # t .= view(t¹, 1, :, :)
-            # t³ = StackView(t, t, t, dims=1);
 
             𝛥₁𝑆[t³] .= 0
             𝛥₂𝑆[t³] .= 0

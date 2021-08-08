@@ -1,9 +1,8 @@
 module ImageSmooth
 
 using ImageFiltering, FFTW
-using ImageCore
-using ImageCore: GenericGrayImage, GenericImage
 using ImageBase
+using ImageBase.ImageCore: GenericGrayImage, GenericImage
 
 #TODO: port SmoothAPI to ImagesAPI
 include("SmoothAPI/SmoothAPI.jl")
