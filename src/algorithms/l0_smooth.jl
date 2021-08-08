@@ -129,8 +129,10 @@ function (f::L0Smooth)(out::AbstractArray{<: Number},
 
     𝛥₁𝑆 = similar(𝑆)
     𝛥₂𝑆 = similar(𝑆)
-    𝛻₁ℎ = similar(𝑆)
-    𝛻₂𝑣 = similar(𝑆)
+    s³ = similar(𝑆)
+    s¹ = zeros(1, N, M)
+    𝛥₁ᵀℎ = similar(𝑆)
+    𝛥₂ᵀ𝑣 = similar(𝑆)
 
     Normin = similar(ℱ𝐼) 
     t¹ = trues(1, N, M)
@@ -141,14 +143,16 @@ function (f::L0Smooth)(out::AbstractArray{<: Number},
         # Computing (ℎ, 𝑣) via solving equation (9) in [1]
         # We get the solution (12) in [1] through following process
         # Use (𝛥₁𝑆, 𝛥₂𝑆) to demonstrate (ℎ, 𝑣) for convenience
-        forwarddiff!(𝛥₁𝑆, 𝑆, dims = 3)
-        forwarddiff!(𝛥₂𝑆, 𝑆, dims = 2)
+        fdiff!(𝛥₁𝑆, 𝑆, dims = 3, boundary=:periodic)
+        fdiff!(𝛥₂𝑆, 𝑆, dims = 2, boundary=:periodic)
 
         # For each pixel 𝑝 in 𝑆
         # (ℎₚ, 𝑣ₚ) = (0, 0), while (𝛥₁𝑆ₚ^2 + 𝛥₂𝑆ₚ^2) < λ / 𝛽
         # (ℎₚ, 𝑣ₚ) = (𝛥₁𝑆ₚ, 𝛥₂𝑆ₚ), otherwise
         if D > 1
-            t¹ .= sum((𝛥₁𝑆.^2 .+ 𝛥₂𝑆.^2), dims=1) .< 𝜆 / 𝛽
+            @. s³ = 𝛥₁𝑆^2 + 𝛥₂𝑆^2
+            s¹ .= sum(s³, dims=1)
+            @. t¹ = s¹ < 𝜆 / 𝛽
             t³ .= repeat(t¹, inner=(1, 1, 1), outer=(D, 1, 1))
 
             𝛥₁𝑆[t³] .= 0
@@ -163,14 +167,17 @@ function (f::L0Smooth)(out::AbstractArray{<: Number},
         # For equation (8), ℎ = 𝛥₁𝑆, 𝑣 = 𝛥₂𝑆
         # According to Convolution Theorem, ℱ(𝑓₁ * 𝑓₂) = ℱ(𝑓₁) ⋅ ℱ(𝑓₂)
         # ℱ is the FFT operator, * is a convolution operator, ⋅ is a matrix dot times operator
-        # We can compute ℱ(∂₁)* ⋅ ℱ(ℎ) and ℱ(∂₂)* ⋅ ℱ(𝑣) by computing ℱ(𝛻₁ℎ) and ℱ(𝛻₂𝑣)
+        # We can compute ℱ(∂₁)* ⋅ ℱ(ℎ) and ℱ(∂₂)* ⋅ ℱ(𝑣) by computing ℱ(𝛥₁ᵀℎ) and ℱ(𝛥₂ᵀ𝑣)
         # ∂₁ and ∂₂ are the difference operators along horizontal axis and vertical axis, respectivly
-        # 𝛻₁() and 𝛻₂() indicate the backward difference along horizontal axis and vertical axis
-        backdiff!(𝛻₁ℎ, 𝛥₁𝑆, dims = 3)
-        backdiff!(𝛻₂𝑣, 𝛥₂𝑆, dims = 2)
+        # ℱ()* denotes the complex conjugate
+        # 𝛥₁ᵀ() and 𝛥₂ᵀ() indicate the transposition of forward difference along horizontal axis and vertical axis
+        fdiff!(𝛥₁ᵀℎ, 𝛥₁𝑆, dims = 3, rev=true, boundary=:periodic)
+        fdiff!(𝛥₂ᵀ𝑣, 𝛥₂𝑆, dims = 2, rev=true, boundary=:periodic)
+        @. 𝛥₁ᵀℎ = -𝛥₁ᵀℎ
+        @. 𝛥₂ᵀ𝑣 = -𝛥₂ᵀ𝑣
 
         # Computing S via equation (8)
-        @. Normin = complex(𝛻₁ℎ + 𝛻₂𝑣)
+        @. Normin = complex(𝛥₁ᵀℎ + 𝛥₂ᵀ𝑣)
         fft!(Normin, (2, 3))
         @. ℱ𝑆 = (ℱ𝐼 + 𝛽 * Normin) / (1 + 𝛽 * Denormin)
         ifft!(ℱ𝑆, (2, 3))

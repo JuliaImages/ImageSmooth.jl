@@ -2,7 +2,7 @@ using ImageSmooth
 using Test, ReferenceTests, TestImages
 using FileIO
 using ImageTransformations, ImageQualityIndexes
-using ImageCore
+using ImageBase
 
 include("testutils.jl")
 

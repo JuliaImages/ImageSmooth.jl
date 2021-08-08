@@ -1,7 +1,7 @@
 module SmoothAPI
 
-using ImageCore
-using ImageCore: GenericGrayImage, GenericImage
+using ImageBase
+using ImageBase.ImageCore: GenericGrayImage, GenericImage
 
 """
     AbstractImageAlgorithm
