@@ -59,7 +59,7 @@ function smooth(img::GenericGrayImage,
                 f::AbstractImageSmoothAlgorithm,
                 args...; kwargs...)
     input = reshape(channelview(img), 1, size(img)...)
-    out = similar(float64.(input))
+    out = similar(input, Float64)
     smooth!(out, input, f, args...; kwargs...)
     return colorview(Gray, out[1, :, :])
 end
@@ -68,7 +68,7 @@ function smooth(img::GenericImage{<:Color3},
                 f::AbstractImageSmoothAlgorithm,
                 args...; kwargs...)
     input = channelview(img)
-    out = similar(float64.(input))
+    out = similar(input, Float64)
     smooth!(out, input, f, args...; kwargs...)
     return colorview(RGB, out)
 end

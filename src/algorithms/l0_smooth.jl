@@ -129,11 +129,14 @@ function (f::L0Smooth)(out::AbstractArray{<: Number},
 
     𝛥₁𝑆 = similar(𝑆)
     𝛥₂𝑆 = similar(𝑆)
+    s³ = similar(𝑆)
+    s¹ = zeros(1, N, M)
     𝛻₁ℎ = similar(𝑆)
     𝛻₂𝑣 = similar(𝑆)
 
     Normin = similar(ℱ𝐼) 
     t¹ = trues(1, N, M)
+    t = trues(N, M)
     t³ = trues(D, N, M)
     ℱ𝑆 = similar(ℱ𝐼)
 
@@ -141,15 +144,20 @@ function (f::L0Smooth)(out::AbstractArray{<: Number},
         # Computing (ℎ, 𝑣) via solving equation (9) in [1]
         # We get the solution (12) in [1] through following process
         # Use (𝛥₁𝑆, 𝛥₂𝑆) to demonstrate (ℎ, 𝑣) for convenience
-        forwarddiff!(𝛥₁𝑆, 𝑆, dims = 3)
-        forwarddiff!(𝛥₂𝑆, 𝑆, dims = 2)
+        fdiff!(𝛥₁𝑆, 𝑆, dims = 3, boundary=:periodic)
+        fdiff!(𝛥₂𝑆, 𝑆, dims = 2, boundary=:periodic)
 
         # For each pixel 𝑝 in 𝑆
         # (ℎₚ, 𝑣ₚ) = (0, 0), while (𝛥₁𝑆ₚ^2 + 𝛥₂𝑆ₚ^2) < λ / 𝛽
         # (ℎₚ, 𝑣ₚ) = (𝛥₁𝑆ₚ, 𝛥₂𝑆ₚ), otherwise
         if D > 1
-            t¹ .= sum((𝛥₁𝑆.^2 .+ 𝛥₂𝑆.^2), dims=1) .< 𝜆 / 𝛽
+            @. s³ = 𝛥₁𝑆^2 + 𝛥₂𝑆^2
+            s¹ .= sum(s³, dims=1)
+            @. t¹ = s¹ < 𝜆 / 𝛽
+            # t¹ .= sum((𝛥₁𝑆.^2 .+ 𝛥₂𝑆.^2), dims=1) .< 𝜆 / 𝛽
             t³ .= repeat(t¹, inner=(1, 1, 1), outer=(D, 1, 1))
+            # t .= view(t¹, 1, :, :)
+            # t³ = StackView(t, t, t, dims=1);
 
             𝛥₁𝑆[t³] .= 0
             𝛥₂𝑆[t³] .= 0
@@ -166,8 +174,10 @@ function (f::L0Smooth)(out::AbstractArray{<: Number},
         # We can compute ℱ(∂₁)* ⋅ ℱ(ℎ) and ℱ(∂₂)* ⋅ ℱ(𝑣) by computing ℱ(𝛻₁ℎ) and ℱ(𝛻₂𝑣)
         # ∂₁ and ∂₂ are the difference operators along horizontal axis and vertical axis, respectivly
         # 𝛻₁() and 𝛻₂() indicate the backward difference along horizontal axis and vertical axis
-        backdiff!(𝛻₁ℎ, 𝛥₁𝑆, dims = 3)
-        backdiff!(𝛻₂𝑣, 𝛥₂𝑆, dims = 2)
+        fdiff!(𝛻₁ℎ, 𝛥₁𝑆, dims = 3, rev=true, boundary=:periodic)
+        fdiff!(𝛻₂𝑣, 𝛥₂𝑆, dims = 2, rev=true, boundary=:periodic)
+        @. 𝛻₁ℎ = -𝛻₁ℎ
+        @. 𝛻₂𝑣 = -𝛻₂𝑣
 
         # Computing S via equation (8)
         @. Normin = complex(𝛻₁ℎ + 𝛻₂𝑣)
