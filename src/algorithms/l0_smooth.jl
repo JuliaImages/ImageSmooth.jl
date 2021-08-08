@@ -170,7 +170,7 @@ function (f::L0Smooth)(out::AbstractArray{<: Number},
         # We can compute ℱ(∂₁)* ⋅ ℱ(ℎ) and ℱ(∂₂)* ⋅ ℱ(𝑣) by computing ℱ(𝛥₁ᵀℎ) and ℱ(𝛥₂ᵀ𝑣)
         # ∂₁ and ∂₂ are the difference operators along horizontal axis and vertical axis, respectivly
         # ℱ()* denotes the complex conjugate
-        # 𝛥₁ᵀ() and 𝛥₂ᵀ() indicate the backward difference along horizontal axis and vertical axis
+        # 𝛥₁ᵀ() and 𝛥₂ᵀ() indicate the transposition of forward difference along horizontal axis and vertical axis
         fdiff!(𝛥₁ᵀℎ, 𝛥₁𝑆, dims = 3, rev=true, boundary=:periodic)
         fdiff!(𝛥₂ᵀ𝑣, 𝛥₂𝑆, dims = 2, rev=true, boundary=:periodic)
         @. 𝛥₁ᵀℎ = -𝛥₁ᵀℎ
