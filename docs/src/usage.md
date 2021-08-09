@@ -55,10 +55,9 @@ fₛ = L0Smooth()
 ```
 
 ```@repl smooth!
-input = reshape(channelview(img), 1, size(img)...);
-imgₛ = similar(float64.(input));
+imgₛ = similar(img);
 
-smooth!(imgₛ, input, fₛ);
+smooth!(imgₛ, img, fₛ);
 ```
 
 ## Demonstration
@@ -95,11 +94,10 @@ img = testimage("cameraman")
 
 fₛ = L0Smooth()
 
-input = reshape(channelview(img), 1, size(img)...)
-imgₛ = similar(float64.(input))
+imgₛ = similar(img)
 
-smooth!(imgₛ, input, fₛ)
+smooth!(imgₛ, img, fₛ)
 
 # View the original image and the smoothed image
-mosaicview(img, imgₛ[1, :, :]; nrow=1)
+mosaicview(img, imgₛ; nrow=1)
 ```

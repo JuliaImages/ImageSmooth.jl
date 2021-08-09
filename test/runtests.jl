@@ -3,6 +3,7 @@ using Test, ReferenceTests, TestImages
 using FileIO
 using ImageTransformations, ImageQualityIndexes
 using ImageBase
+using OffsetArrays
 
 include("testutils.jl")
 
