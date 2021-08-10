@@ -19,16 +19,7 @@ fₛ = L0Smooth()
 imgₛ = smooth(img, fₛ)
 
 # Or use in-place version `smooth!`
-
-## Ror Gray images
-input = reshape(channelview(img), 1, size(img)...)
-imgₛ = similar(float64.(input))
-
-smooth!(imgₛ, input, fₛ)
-
-## For RGB images
-input = channelview(img)
-imgₛ = similar(float64.(input))
+imgₛ = similar(img)
 
 smooth!(imgₛ, img, fₛ)
 ```
@@ -49,8 +40,8 @@ algorithms.
 """
 abstract type AbstractImageSmoothAlgorithm <: AbstractImageFilter end
 
-smooth!(out::AbstractArray{<: Number},
-        img::AbstractArray{<: Number},
+smooth!(out::GenericImage,
+        img::GenericImage,
         f::AbstractImageSmoothAlgorithm,
         args...; kwargs...) =
     f(out, img, args...; kwargs...)
@@ -58,27 +49,25 @@ smooth!(out::AbstractArray{<: Number},
 function smooth(img::GenericGrayImage,
                 f::AbstractImageSmoothAlgorithm,
                 args...; kwargs...)
-    input = reshape(channelview(img), 1, size(img)...)
-    out = similar(input, Float64)
-    smooth!(out, input, f, args...; kwargs...)
-    return colorview(Gray, out[1, :, :])
+    out = similar(img)
+    smooth!(out, img, f, args...; kwargs...)
+    return out
 end
 
-function smooth(img::GenericImage{<:Color3},
+function smooth(img::GenericImage{<:AbstractRGB},
                 f::AbstractImageSmoothAlgorithm,
                 args...; kwargs...)
-    input = channelview(img)
-    out = similar(input, Float64)
-    smooth!(out, input, f, args...; kwargs...)
-    return colorview(RGB, out)
+    out = similar(img)
+    smooth!(out, img, f, args...; kwargs...)
+    return out
 end
 
 ### Docstrings
 
 """
-    smooth!(out::AbstractArray{<: Number}, img::AbstractArray{<: Number}, fₛ::AbstractImageSmoothAlgorithm, args...; kwargs...)
+    smooth!(out::GenericImage, img::GenericImage, fₛ::AbstractImageSmoothAlgorithm, args...; kwargs...)
 
-Smooth `img::AbstractArray{<: Number}` using algorithm `fₛ`
+Smooth `img::GenericImage` using algorithm `fₛ`
 
 # Output
 
@@ -92,15 +81,8 @@ Just simply pass an algorithm to `smooth!`:
 # First generate an algorithm instance
 fₛ = L0Smooth()
 
-## For Gray images
-input = reshape(channelview(img), 1, size(img)...)
-imgₛ = similar(float64.(input))
-
-smooth!(imgₛ, input, fₛ)
-
-## For RGB images
-input = channelview(img)
-imgₛ = similar(float64.(input))
+## For Gray or RGB images
+imgₛ = similar(img)
 
 smooth!(imgₛ, img, fₛ)
 ```
@@ -116,7 +98,7 @@ Smooth `img` using algorithm `fₛ`
 
 # Output
 
-The return image `imgₛ` is an `Array{Gray{Float64}} for `Gray` image, and `Array{RGB{Float64}}` for `RGB` image.
+The return image `imgₛ` is an `Array{Gray{N0f8}} for `Gray` image, and `Array{RGB{N0f8}}` for `RGB` image.
 
 # Examples
 

@@ -26,8 +26,8 @@
         f = L0Smooth()
         smoothed_img_gray = smooth(img_gray, f)
         smoothed_img_rgb = smooth(img_rgb, f)
-        @test eltype(smoothed_img_gray) == Gray{Float64}
-        @test eltype(smoothed_img_rgb) == RGB{Float64}
+        @test eltype(smoothed_img_gray) == Gray{N0f8}
+        @test eltype(smoothed_img_rgb) == RGB{N0f8}
     end
 
     @testset "ReferenceTests" begin
@@ -49,5 +49,16 @@
         out = smooth(img_rgb, f)
         @test assess_psnr(out, eltype(out).(ref)) >= 27
         end
+    end
+
+    @testset "Offset Arrays" begin
+        # Verify that the algorithms give equivalent results on OffsetArrays
+        img = imresize(testimage("cameraman"), (64, 64))
+        offset_img = OffsetArray(img, OffsetArrays.Origin(0))
+        fₛ = L0Smooth()
+        imgₛ = smooth(img, fₛ)
+        offset_imgₛ = smooth(offset_img, fₛ)
+        @test axes(offset_imgₛ) == axes(offset_img)
+        @test imgₛ == OffsetArrays.no_offset_view(offset_imgₛ)
     end
 end
