@@ -1,6 +1,6 @@
 name = "ImageSmooth"
 uuid = "a14a6c0f-317a-4379-b4a0-4ba4e1e9b5ed"
-authors = ["Johnny Chen <johnnychen94@hotmail.com>"]
+authors = ["Johnny Chen <johnnychen94@hotmail.com>", "JKay <2439951158@qq.com>"]
 version = "0.1.0"
 
 [deps]
