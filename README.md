@@ -9,4 +9,4 @@
 
 | Algorithms | Preview | References |
 | ---        | ------  | -------    |
-| `L0Smooth` | ![L0Smooth_preview]() | Image Smoothing via L0 Gradient Minimization |
+| `L0Smooth()` | ![L0Smooth_preview](https://user-images.githubusercontent.com/8684355/132154402-e65af01c-4459-4c81-bcd3-c66052d1e129.png) | Image Smoothing via L0 Gradient Minimization |
