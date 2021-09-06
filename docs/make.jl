@@ -1,12 +1,10 @@
-push!(LOAD_PATH,"../src/")
-using ImageSmooth, TestImages, MosaicViews
+using ImageSmooth
 using Documenter
 
 DocMeta.setdocmeta!(ImageSmooth, :DocTestSetup, :(using ImageSmooth); recursive=true)
 
 makedocs(;
     modules=[ImageSmooth],
-    repo="https://github.com/JuliaImages/ImageSmooth.jl/blob/{commit}{path}#{line}",
     sitename="ImageSmooth.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
