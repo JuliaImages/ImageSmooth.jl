@@ -1,27 +1,36 @@
 name: CI
 on:
-  - push
-  - pull_request
+  create:
+    tags:
+  push:
+    branches:
+      - master
+  pull_request:
+
 jobs:
   test:
-    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        version:
-          - '1'
-          - '1.0'
-          - 'nightly'
-        os:
-          - ubuntu-latest
-        arch:
-          - x64
+        julia-version: ['1.0', '1', 'nightly']
+        os: [ubuntu-latest]
+        arch: [x64]
+        include:
+          - os: windows-latest
+            julia-version: '1'
+            arch: x64
+          - os: macOS-latest
+            julia-version: '1'
+            arch: x64
+          - os: ubuntu-latest
+            julia-version: '1'
+            arch: x86
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:
-          version: ${{ matrix.version }}
+          version: ${{ matrix.julia-version }}
           arch: ${{ matrix.arch }}
       - uses: actions/cache@v1
         env:
@@ -52,13 +61,6 @@ jobs:
             using Pkg
             Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()'
-      - run: |
-          julia --project=docs -e '
-            using Documenter: DocMeta, doctest
-            using ImageSmooth
-            DocMeta.setdocmeta!(ImageSmooth, :DocTestSetup, :(using ImageSmooth); recursive=true)
-            doctest(ImageSmooth)'
       - run: julia --project=docs docs/make.jl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
