@@ -98,7 +98,7 @@ and the solution for each pixel `` p `` is:
 In the following examples, L0 Smooth algorithm is used to smoothing both Gray image and RGB image.
 
 ```@setup mosaicviews
-using Images, TestImages, MosaicViews
+using ImageCore, ImageShow, TestImages
 ```
 
 ```@example mosaicviews

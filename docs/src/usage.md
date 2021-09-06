@@ -67,7 +67,7 @@ To use the smoothing operator, you have to first define a `fₛ::AbstractImageSm
 * You can use [`smooth`](@ref smooth) to process your image:
 
 ```@setup mosaicviews
-using Images, TestImages, MosaicViews
+using Images, TestImages
 ```
 
 ```@example mosaicviews
