@@ -128,6 +128,9 @@ function (f::L0Smooth)(out::GenericGrayImage,
     t¹ = trues(N, M)
     ℱ𝑆 = similar(ℱ𝐼)
 
+    # precompute the FFT plan so that we get fast FFT inside the iteration
+    F = plan_fft!(ℱ𝐼, (1, 2))
+    IF = plan_ifft!(ℱ𝐼, (1, 2))
     while 𝛽 < 𝛽max
         # Computing (ℎ, 𝑣) via solving equation (9) in [1]
         # We get the solution (12) in [1] through following process
@@ -152,14 +155,13 @@ function (f::L0Smooth)(out::GenericGrayImage,
         # 𝛥₁ᵀ() and 𝛥₂ᵀ() indicate the transposition of forward difference along horizontal axis and vertical axis
         fdiff!(𝛥₁ᵀℎ, 𝛥₁𝑆, dims = 2, rev=true, boundary=:periodic)
         fdiff!(𝛥₂ᵀ𝑣, 𝛥₂𝑆, dims = 1, rev=true, boundary=:periodic)
-        @. 𝛥₁ᵀℎ = -𝛥₁ᵀℎ
-        @. 𝛥₂ᵀ𝑣 = -𝛥₂ᵀ𝑣
 
         # Computing S via equation (8) in [1]
-        @. Normin = complex(𝛥₁ᵀℎ + 𝛥₂ᵀ𝑣)
-        fft!(Normin, (1, 2))
+        @. Normin = complex(-𝛥₁ᵀℎ - 𝛥₂ᵀ𝑣)
+        F * Normin # fft!(Normin, (1, 2))
+
         @. ℱ𝑆 = (ℱ𝐼 + 𝛽 * Normin) / (1 + 𝛽 * Denormin)
-        ifft!(ℱ𝑆, (1, 2))
+        IF * ℱ𝑆 # ifft!(ℱ𝑆, (1, 2))
         @. 𝑆 = real(ℱ𝑆)
 
         𝛽 = 𝛽 * 𝜅
